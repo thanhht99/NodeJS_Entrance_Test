@@ -23,7 +23,7 @@ export class ToDo {
     description: string;
 
     @ManyToOne(() => User, user => user.todos)
-    userId: User;
+    user: User;
 
     @Column({
         type: "enum",

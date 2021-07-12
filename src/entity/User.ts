@@ -23,7 +23,7 @@ export class User {
     })
     password: string;
 
-    @OneToMany(() => ToDo, todo => todo.userId)
+    @OneToMany(() => ToDo, todo => todo.user)
     todos: ToDo[];
 
 }

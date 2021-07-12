@@ -71,3 +71,46 @@ export const getAllToDo = async (req: Request, res: Response): Promise<Response>
     }    
 }
 
+export const getToDoById = async (req: Request, res: Response): Promise<Response> => {
+    try {
+        const { id } = req.params;
+        const toDo = await getRepository(ToDo).findOne({
+            where: { id }
+        })
+        if (toDo) {
+            return res.status(200).json(new SuccessResponse(200,toDo)); 
+        }
+        return res.json(new ErrorResponse(404, "ToDo not exist"));
+    } catch (err) {
+        return res.json(new ErrorResponse(400, err));
+    }    
+}
+
+interface IUserRequest extends Request {
+    user: User
+}
+
+export const assignToDo = async (req: IUserRequest, res: Response): Promise<Response> => {
+    try {
+        const { id, assignUserId } = req.body;
+        const checkToDo = await getRepository(ToDo).findOne({
+            where: { id }
+        })
+        const checkAssignUser = await getRepository(User).findOne({
+            where: { id:assignUserId }
+        })
+        if (!checkAssignUser)
+            return res.json(new ErrorResponse(404, "User not exist"));
+        if (!checkToDo)
+            return res.json(new ErrorResponse(404, "ToDo not exist"));
+        if (req.user.username !== checkAssignUser.username)
+        {
+            const assignUser = await getRepository(ToDo).update(id, { user:assignUserId, dateOfModification: new Date() });
+            return res.status(200).json(new SuccessResponse(200, "Assign successed"));
+        }
+        return res.json(new ErrorResponse(404, "Assign user invalid"));        
+    } catch (err) {
+        return res.json(new ErrorResponse(400, err));
+    }    
+}
+

@@ -56,3 +56,12 @@ export const signIn = async (req: Request, res: Response): Promise<Response> => 
         return res.json(new ErrorResponse(400, err));
     }    
 }
+
+export const getAllUser = async (req: Request, res: Response): Promise<Response> => {
+    try {
+        const listUsers = await getRepository(User).find();
+        return res.status(200).json(new SuccessResponse(200,listUsers)); 
+    } catch (err) {
+        return res.json(new ErrorResponse(400, err));
+    }    
+}
