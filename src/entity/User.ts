@@ -1,4 +1,5 @@
-import {Entity, PrimaryGeneratedColumn, Column} from "typeorm";
+import {Entity, PrimaryGeneratedColumn, Column, OneToMany} from "typeorm";
+import { ToDo } from "./ToDo";
 
 @Entity()
 export class User {
@@ -21,5 +22,8 @@ export class User {
         nullable: false,
     })
     password: string;
+
+    @OneToMany(() => ToDo, todo => todo.userId)
+    todos: ToDo[];
 
 }
