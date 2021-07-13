@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinTable } from "typeorm";
 import { User } from "./User";
 
 export enum toDoStatuses {
@@ -23,6 +23,7 @@ export class ToDo {
     description: string;
 
     @ManyToOne(() => User, user => user.todos)
+    @JoinTable()
     user: User;
 
     @Column({
@@ -42,3 +43,4 @@ export class ToDo {
     dateOfModification: Date;
 
 }
+

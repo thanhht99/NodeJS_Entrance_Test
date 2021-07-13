@@ -64,7 +64,11 @@ export const removeToDo = async (req: Request, res: Response): Promise<Response>
 
 export const getAllToDo = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const listToDos = await getRepository(ToDo).find();
+        // const listToDos = await getRepository(ToDo).find();
+        const listToDos = await getRepository(ToDo)
+                .createQueryBuilder("todo")
+                .leftJoinAndSelect("todo.user", "user")
+                .getMany();
         return res.status(200).json(new SuccessResponse(200,listToDos)); 
     } catch (err) {
         return res.json(new ErrorResponse(400, err));
@@ -74,10 +78,15 @@ export const getAllToDo = async (req: Request, res: Response): Promise<Response>
 export const getToDoById = async (req: Request, res: Response): Promise<Response> => {
     try {
         const { id } = req.params;
-        const toDo = await getRepository(ToDo).findOne({
+        const checkToDo = await getRepository(ToDo).findOne({
             where: { id }
-        })
-        if (toDo) {
+        })        
+        if (checkToDo) {
+            const toDo = await getRepository(ToDo)
+                .createQueryBuilder("todo")
+                .leftJoinAndSelect("todo.user", "user")
+                .where("todo.id = :id", { id: `${id}` })
+                .getMany();
             return res.status(200).json(new SuccessResponse(200,toDo)); 
         }
         return res.json(new ErrorResponse(404, "ToDo not exist"));
@@ -105,7 +114,8 @@ export const assignToDo = async (req: IUserRequest, res: Response): Promise<Resp
             return res.json(new ErrorResponse(404, "ToDo not exist"));
         if (req.user.username !== checkAssignUser.username)
         {
-            const assignUser = await getRepository(ToDo).update(id, { user:assignUserId, dateOfModification: new Date() });
+            await getRepository(ToDo).update(id, { user: assignUserId, dateOfModification: new Date() });
+            
             return res.status(200).json(new SuccessResponse(200, "Assign successed"));
         }
         return res.json(new ErrorResponse(404, "Assign user invalid"));        
