@@ -64,7 +64,6 @@ export const removeToDo = async (req: Request, res: Response): Promise<Response>
 
 export const getAllToDo = async (req: Request, res: Response): Promise<Response> => {
     try {
-        // const listToDos = await getRepository(ToDo).find();
         const listToDos = await getRepository(ToDo)
                 .createQueryBuilder("todo")
                 .leftJoinAndSelect("todo.user", "user")
